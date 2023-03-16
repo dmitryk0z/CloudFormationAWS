@@ -1,0 +1,515 @@
+Resources:
+  # VPC
+  VPCTelecomCompany:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/24"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: VPCTelecomCompany
+
+  # IGW
+  IGWTelecomCompany:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: IGWTelecomCompany
+  IGWTelecomCompanyAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPCTelecomCompany
+      InternetGatewayId: !Ref IGWTelecomCompany
+
+  # Subnets
+  SubnetApp1TelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.0.0.0/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetApp1TelecomCompany
+
+  SubnetApp2TelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.0.0.16/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetApp2TelecomCompany
+
+  SubnetRDS1TelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.0.0.32/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetRDS1TelecomCompany
+
+  SubnetRDS2TelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.0.0.48/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetRDS2TelecomCompany
+
+  SubnetELB1TelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.0.0.64/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetELB1TelecomCompany
+
+  SubnetELB2TelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.0.0.80/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetELB2TelecomCompany
+
+  SubnetNAT1TelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.0.0.96/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetNAT1TelecomCompany
+
+  SubnetNAT2TelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.0.0.112/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetNAT2TelecomCompany
+
+  SubnetBastionTelecomCompany:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.0.0.128/28
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SubnetBastionTelecomCompany
+
+  # NAT Gateways
+  NATGateway1TelecomCompany:
+    Type: "AWS::EC2::NatGateway"
+    Properties:
+      AllocationId: !GetAtt EIPNATGateway1TelecomCompany.AllocationId
+      SubnetId: !Ref SubnetNAT1TelecomCompany
+      Tags:
+        - Key: Name
+          Value: NATGateway1TelecomCompany
+
+  NATGateway2TelecomCompany:
+    Type: "AWS::EC2::NatGateway"
+    Properties:
+      AllocationId: !GetAtt EIPNATGateway2TelecomCompany.AllocationId
+      SubnetId: !Ref SubnetNAT2TelecomCompany
+      Tags:
+        - Key: Name
+          Value: NATGateway2TelecomCompany
+
+  # NAT EIPs
+  EIPNATGateway1TelecomCompany:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: "vpc"
+
+  EIPNATGateway2TelecomCompany:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: "vpc"
+  
+ # Route Tables
+  RouteTableApp1TelecomCompany:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: RouteTableApp1TelecomCompany
+  RouteToNAT1:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref RouteTableApp1TelecomCompany
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId: !Ref NATGateway1TelecomCompany
+  
+  RouteTableApp2TelecomCompany:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: RouteTableApp2TelecomCompany
+  RouteToNAT2:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref RouteTableApp2TelecomCompany
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId: !Ref NATGateway2TelecomCompany
+  
+  RouteTableRDSTelecomCompany:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: RouteTableRDSTelecomCompany
+
+  RouteTableELBTelecomCompany:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: RouteTableELBTelecomCompany
+  RouteToInternetELB:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref RouteTableELBTelecomCompany
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref IGWTelecomCompany
+
+  RouteTableNATTelecomCompany:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: RouteTableNATTelecomCompany
+  RouteToInternetNAT:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref RouteTableNATTelecomCompany
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref IGWTelecomCompany
+
+  RouteTableBastionTelecomCompany:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: RouteTableBastionTelecomCompany
+  RouteToInternetBastion:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref RouteTableBastionTelecomCompany
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref IGWTelecomCompany
+
+  # Subnets to RouteTables Association
+  SubnetRouteTableAssociationBastionTelecomCompany:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableBastionTelecomCompany
+      SubnetId: !Ref SubnetBastionTelecomCompany
+  SubnetRouteTableAssociationApp1TelecomCompany:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableApp1TelecomCompany
+      SubnetId: !Ref SubnetApp1TelecomCompany
+  SubnetRouteTableAssociationApp2TelecomCompany:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableApp2TelecomCompany
+      SubnetId: !Ref SubnetApp2TelecomCompany
+  SubnetRouteTableAssociationRDSTelecomCompany1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableRDSTelecomCompany
+      SubnetId: !Ref SubnetRDS1TelecomCompany
+  SubnetRouteTableAssociationRDSTelecomCompany2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableRDSTelecomCompany
+      SubnetId: !Ref SubnetRDS2TelecomCompany
+  SubnetRouteTableAssociationELBTelecomCompany1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableELBTelecomCompany
+      SubnetId: !Ref SubnetELB1TelecomCompany
+  SubnetRouteTableAssociationELBTelecomCompany2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableELBTelecomCompany
+      SubnetId: !Ref SubnetELB2TelecomCompany
+  SubnetRouteTableAssociationNATTelecomCompany1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableNATTelecomCompany
+      SubnetId: !Ref SubnetNAT1TelecomCompany
+  SubnetRouteTableAssociationNATTelecomCompany2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RouteTableNATTelecomCompany
+      SubnetId: !Ref SubnetNAT2TelecomCompany
+
+  # Security Groups
+  SecurityGroupELBTelecomCompany:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: SecurityGroupELBTelecomCompany
+      GroupDescription: SecurityGroup for ELB (web traffic only)
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SecurityGroupELBTelecomCompany
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  SecurityGroupBastionTelecomCompany:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: SecurityGroupBastionTelecomCompany
+      GroupDescription: SecurityGroup for Bastion (allow ssh access from anywhere)
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SecurityGroupBastionTelecomCompany
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  SecurityGroupAppTelecomCompany:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: SecurityGroupAppTelecomCompany
+      GroupDescription: SecurityGroup for App (allow app access)
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SecurityGroupAppTelecomCompany
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref SecurityGroupELBTelecomCompany
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref SecurityGroupBastionTelecomCompany
+
+  SecurityGroupRDSTelecomCompany:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: SecurityGroupRDSTelecomCompany
+      GroupDescription: SecurityGroup for RDS (allow PostgreSQL access)
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SecurityGroupRDSTelecomCompany
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref SecurityGroupAppTelecomCompany
+
+  SecurityGroupNATTelecomCompany:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: SecurityGroupNATTelecomCompany
+      GroupDescription: SecurityGroup for NAT (internet access for App)
+      VpcId: !Ref VPCTelecomCompany
+      Tags:
+        - Key: Name
+          Value: SecurityGroupNATTelecomCompany
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref SecurityGroupAppTelecomCompany
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref SecurityGroupAppTelecomCompany
+
+  # SubnetGroup for RDS
+  SubnetGroupRDSTelecomCompany:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupName: "SubnetGroupRDSTelecomCompany"
+      DBSubnetGroupDescription: "Subnet Group for RDS"
+      SubnetIds:
+        - !Ref SubnetRDS1TelecomCompany
+        - !Ref SubnetRDS2TelecomCompany
+      Tags:
+        - Key: "Name"
+          Value: "SubnetGroupRDSTelecomCompany"
+
+  # # RDS DB Instances 
+  # RDSCluster:
+  #   Type: AWS::RDS::DBCluster
+  #   Properties:
+  #     AvailabilityZones:
+  #       - us-east-1a
+  #       - us-east-1b
+  #     DatabaseName: DBClusterTelecomCompany
+  #     #DBInstanceClass: db.t3.micro
+  #     Engine: postgres
+  #     EngineVersion: 13.4
+  #     MasterUsername: admin
+  #     MasterUserPassword: mypassword
+  #     AllocatedStorage: 20
+  #     StorageType: gp2
+  #     Port: 5432
+  #     DBSubnetGroupName: !Ref SubnetGroupRDSTelecomCompany
+  #     VpcSecurityGroupIds:
+  #       - !Ref SecurityGroupRDSTelecomCompany
+  #     #MultiAZ: true
+  #     Tags:
+  #       - Key: Name
+  #         Value: RDSClusterTelecomCompany
+
+  # Key-pairs for EC2 instances (go to Parameter Store to find private keys)
+  EC2ServerKeyTelecomCompany:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: EC2ServerKeyTelecomCompany
+      Tags:
+        - Key: Name
+          Value: EC2ServerKeyTelecomCompany
+
+  EC2BastionServerKeyTelecomCompany:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: EC2BastionServerKeyTelecomCompany
+      Tags:
+        - Key: Name
+          Value: EC2BastionServerKeyTelecomCompany
+          
+  # EC2 instances
+  EC2Server1TelecomCompany:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0557a15b87f6559cf
+      KeyName: EC2ServerKeyTelecomCompany
+      SubnetId: !Ref SubnetApp1TelecomCompany
+      SecurityGroupIds:
+        - !Ref SecurityGroupAppTelecomCompany
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 10
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: EC2Server1TelecomCompany
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          sudo apt-get install software-properties-common -y
+          sudo apt-get update -y
+          sudo apt-get install awscli -y
+          sudo apt-get install git-all -y
+          sudo apt-get install apache2
+          sudo apt-get install Node.js -y
+          sudo apt-get install npm -y
+
+  EC2Server2TelecomCompany:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0557a15b87f6559cf
+      KeyName: EC2ServerKeyTelecomCompany
+      SubnetId: !Ref SubnetApp2TelecomCompany
+      SecurityGroupIds:
+        - !Ref SecurityGroupAppTelecomCompany
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 10
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: EC2Server2TelecomCompany
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          sudo apt-get install software-properties-common -y
+          sudo apt-get update -y
+          sudo apt-get install awscli -y
+          sudo apt-get install git-all -y
+          sudo apt-get install apache2
+          sudo apt-get install Node.js -y
+          sudo apt-get install npm -y
+
+  EC2BastionServerTelecomCompany:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c94855ba95c71c99
+      KeyName: EC2BastionServerKeyTelecomCompany
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 10
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: EC2BastionServerTelecomCompany
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeviceIndex: '0'
+          GroupSet:
+            - !Ref SecurityGroupBastionTelecomCompany
+          SubnetId: 
+            Ref: "SubnetBastionTelecomCompany"
+
+  # LoadBalancer
+  LoadBalancerTelecomCompany:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      Subnets:
+        - !Ref SubnetELB1TelecomCompany
+        - !Ref SubnetELB2TelecomCompany
+      SecurityGroups:
+        - !Ref SecurityGroupELBTelecomCompany
+      Listeners:
+        - LoadBalancerPort: '80'
+          InstancePort: '80'
+          Protocol: HTTP
+      HealthCheck:
+        Target: HTTP:80/index.html
+        HealthyThreshold: '2'
+        UnhealthyThreshold: '2'
+        Interval: '10'
+        Timeout: '5'
+      Instances:
+        - !Ref EC2Server1TelecomCompany
+        - !Ref EC2Server2TelecomCompany
+      Tags:
+        - Key: Name
+          Value: LoadBalancerTelecomCompany
