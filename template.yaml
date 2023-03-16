@@ -368,7 +368,7 @@ Resources:
         - Key: "Name"
           Value: "SubnetGroupRDSTelecomCompany"
 
-  # # RDS DB Instances 
+  # # RDS DB Instances
   # RDSCluster:
   #   Type: AWS::RDS::DBCluster
   #   Properties:
@@ -387,7 +387,7 @@ Resources:
   #     DBSubnetGroupName: !Ref SubnetGroupRDSTelecomCompany
   #     VpcSecurityGroupIds:
   #       - !Ref SecurityGroupRDSTelecomCompany
-  #     #MultiAZ: true
+  #     MultiAZ: true
   #     Tags:
   #       - Key: Name
   #         Value: RDSClusterTelecomCompany
